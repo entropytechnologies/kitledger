@@ -1,8 +1,7 @@
 import { describe, test, expect } from "vitest";
 import { createDatabase } from "../../packages/core/services/database/db";
 import { postgresUrl, postgresConfig } from "../test_config";
-import { TransactionModelFactory } from "../../packages/core/services/database/factories";
-import { create, validateCreation } from "../../packages/core/actions/transaction_model_actions";
+import { TransactionModels, TransactionModelFactory } from "../../packages/core/main";
 
 createDatabase({
 	postgresUrl,
@@ -17,7 +16,7 @@ describe.sequential("TransactionModel API", () => {
 		const transactionModelPayload = new TransactionModelFactory().make();
 		transactionModelPayload.ref_id = SUCCESS_REF_ID;
 
-		const res = await create(transactionModelPayload);
+		const res = await TransactionModels.create(transactionModelPayload);
 
 		expect(res.id).toHaveLength(36);
 		expect(res.ref_id).toBe(SUCCESS_REF_ID);
@@ -27,7 +26,7 @@ describe.sequential("TransactionModel API", () => {
 		const transactionModelPayload = new TransactionModelFactory().make();
 		transactionModelPayload.name = "A".repeat(256);
 
-		const res = await validateCreation(transactionModelPayload);
+		const res = await TransactionModels.validateCreation(transactionModelPayload);
 
 		expect(res.success).toBe(false);
 	});
@@ -36,7 +35,7 @@ describe.sequential("TransactionModel API", () => {
 		const transactionModelPayload = new TransactionModelFactory().make();
 		transactionModelPayload.ref_id = SUCCESS_REF_ID;
 
-		const res = await validateCreation(transactionModelPayload);
+		const res = await TransactionModels.validateCreation(transactionModelPayload);
 
 		expect(res.success).toBe(false);
 	});

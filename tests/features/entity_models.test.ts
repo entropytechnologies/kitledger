@@ -1,8 +1,7 @@
 import { describe, test, expect } from "vitest";
 import { createDatabase } from "../../packages/core/services/database/db";
 import { postgresUrl, postgresConfig } from "../test_config";
-import { EntityModelFactory } from "../../packages/core/services/database/factories";
-import { create, validateCreation } from "../../packages/core/actions/entity_model_actions";
+import { EntityModels, EntityModelFactory } from "../../packages/core/main";
 
 createDatabase({
 	postgresUrl,
@@ -17,7 +16,7 @@ describe.sequential("EntityModel API", () => {
 		const entityModelPayload = new EntityModelFactory().make();
 		entityModelPayload.ref_id = SUCCESS_REF_ID;
 
-		const res = await create(entityModelPayload);
+		const res = await EntityModels.create(entityModelPayload);
 		expect(res.id).toHaveLength(36);
 		expect(res.ref_id).toBe(SUCCESS_REF_ID);
 	});
@@ -26,7 +25,7 @@ describe.sequential("EntityModel API", () => {
 		const entityModelPayload = new EntityModelFactory().make();
 		entityModelPayload.name = "A".repeat(256);
 
-		const res = await validateCreation(entityModelPayload);
+		const res = await EntityModels.validateCreation(entityModelPayload);
 
 		expect(res.success).toBe(false);
 	});
@@ -35,7 +34,7 @@ describe.sequential("EntityModel API", () => {
 		const entityModelPayload = new EntityModelFactory().make();
 		entityModelPayload.ref_id = SUCCESS_REF_ID;
 
-		const res = await validateCreation(entityModelPayload);
+		const res = await EntityModels.validateCreation(entityModelPayload);
 		expect(res.success).toBe(false);
 	});
 });

@@ -2,7 +2,7 @@ import { getDbInstance } from "../services/database/db.js";
 import { kl_core_transaction_models } from "../services/database/schema.js";
 import z from "zod/v4";
 import { type NewTransactionModel } from "../types/index.js";
-import { valueIsAvailable } from "../services/database/validation.js";
+import { valueIsAvailable } from "../utils/validation.js";
 
 /**
  * Check if the name is available
@@ -36,7 +36,7 @@ async function altIdIsAvailable(alt_id: string): Promise<boolean> {
  * @param data
  * @returns Promise<z.infer<typeof validationSchema>>
  */
-export async function validateCreation(data: NewTransactionModel) {
+async function validateCreation(data: NewTransactionModel) {
 	const validationSchema = z.object({
 		id: z.uuid(),
 		ref_id: z.string().max(64, { error: "Ref ID must be less than 64 characters" }).refine(refIdIsAvailable, {
@@ -63,8 +63,16 @@ export async function validateCreation(data: NewTransactionModel) {
  * Create a new transaction model
  * @param data
  */
-export async function create(data: NewTransactionModel) {
+async function create(data: NewTransactionModel) {
 	const db = getDbInstance();
 	const result = await db.insert(kl_core_transaction_models).values(data).returning();
 	return result[0];
 }
+
+/**
+ * Export a namespaced object with the actions
+ */
+export const TransactionModels = {
+	create,
+	validateCreation,
+};

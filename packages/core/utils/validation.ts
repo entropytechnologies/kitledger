@@ -1,5 +1,5 @@
 import { type PgTableWithColumns } from "drizzle-orm/pg-core";
-import { getDbInstance } from "./db.js";
+import { getDbInstance } from "../services/database/db.js";
 import { eq } from "drizzle-orm";
 import z from "zod/v4";
 

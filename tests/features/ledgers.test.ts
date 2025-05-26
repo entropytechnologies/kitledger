@@ -1,17 +1,14 @@
 import { describe, test, expect } from "vitest";
 import { createDatabase } from "../../packages/core/services/database/db";
 import { postgresUrl, postgresConfig } from "../test_config";
-import { LedgerFactory, UnitTypeFactory } from "../../packages/core/services/database/factories";
-import { create as createUnitType } from "../../packages/core/actions/unit_type_actions";
-import type { UnitType } from "../../packages/core/types/index";
-import { create, validateCreation } from "../../packages/core/actions/ledger_actions";
+import { UnitTypes, Ledgers, LedgerFactory, UnitTypeFactory } from "../../packages/core/main";
 
 createDatabase({
 	postgresUrl,
 	maxConnections: postgresConfig.max_connections,
 });
 
-const uom_type = await createUnitType(new UnitTypeFactory().make());
+const uom_type = await UnitTypes.create(new UnitTypeFactory().make());
 
 const SUCCESS_REF_ID = `T${Math.floor(Math.random() * 9999)}`;
 
@@ -22,7 +19,7 @@ describe.sequential("Ledger API", () => {
 		ledgerPayload.ref_id = SUCCESS_REF_ID;
 		ledgerPayload.unit_type_id = uom_type.id; // Use the id from the setup uom_type
 
-		const res = await create(ledgerPayload);
+		const res = await Ledgers.create(ledgerPayload);
 
 		expect(res.id).toHaveLength(36);
 		expect(res.ref_id).toBe(SUCCESS_REF_ID);
@@ -33,7 +30,7 @@ describe.sequential("Ledger API", () => {
 		ledgerPayload.name = "A".repeat(256);
 		ledgerPayload.unit_type_id = uom_type.id;
 
-		const res = await validateCreation(ledgerPayload);
+		const res = await Ledgers.validateCreation(ledgerPayload);
 
 		expect(res.success).toBe(false);
 	});
@@ -43,7 +40,7 @@ describe.sequential("Ledger API", () => {
 		ledgerPayload.ref_id = SUCCESS_REF_ID;
 		ledgerPayload.unit_type_id = uom_type.id;
 
-		const res = await validateCreation(ledgerPayload);
+		const res = await Ledgers.validateCreation(ledgerPayload);
 
 		expect(res.success).toBe(false);
 	});

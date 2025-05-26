@@ -2,7 +2,7 @@ import { getDbInstance } from "../services/database/db.js";
 import { kl_core_ledgers, kl_core_unit_types } from "../services/database/schema.js";
 import z from "zod/v4";
 import { eq, or } from "drizzle-orm";
-import { valueIsAvailable } from "../services/database/validation.js";
+import { valueIsAvailable } from "../utils/validation.js";
 import { validate as validateUuid } from "uuid";
 import { type NewLedger } from "../types/index.js";
 
@@ -38,7 +38,7 @@ async function altIdIsAvailable(alt_id: string) {
  * @param data
  * @returns Promise<z.infer<typeof validationSchema>>
  */
-export async function validateCreation(data: NewLedger) {
+async function validateCreation(data: NewLedger) {
 	const db = getDbInstance();
 	const validationSchema = z.object({
 		id: z.uuid(),
@@ -95,8 +95,16 @@ export async function validateCreation(data: NewLedger) {
  * @param data
  * @returns Promise<InferSelectModel<typeof ledgers>>
  */
-export async function create(data: NewLedger) {
+async function create(data: NewLedger) {
 	const db = getDbInstance();
 	const result = await db.insert(kl_core_ledgers).values(data).returning();
 	return result[0];
 }
+
+/**
+ * Export a namespaced object with the actions
+ */
+export const Ledgers = {
+	create,
+	validateCreation,
+};

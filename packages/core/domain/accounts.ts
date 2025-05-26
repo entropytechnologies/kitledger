@@ -2,7 +2,7 @@ import { getDbInstance } from "../services/database/db.js";
 import { kl_core_accounts, kl_core_ledgers, BalanceType } from "../services/database/schema.js";
 import z from "zod/v4";
 import { eq, or } from "drizzle-orm";
-import { valueIsAvailable } from "../services/database/validation.js";
+import { valueIsAvailable } from "../utils/validation.js";
 import { validate as validateUuid } from "uuid";
 import { type NewAccount } from "../types/index.js";
 
@@ -33,7 +33,7 @@ async function altIdIsAvailable(alt_id: string): Promise<boolean> {
 	return await valueIsAvailable(kl_core_accounts, "alt_id", alt_id);
 }
 
-export async function validateCreation(data: NewAccount) {
+async function validateCreation(data: NewAccount) {
 	const db = getDbInstance();
 	const validationSchema = z
 		.object({
@@ -137,8 +137,16 @@ export async function validateCreation(data: NewAccount) {
  * @param data
  * @returns Promise<InferSelectModel<typeof accounts>>
  */
-export async function create(data: NewAccount) {
+async function create(data: NewAccount) {
 	const db = getDbInstance();
 	const result = await db.insert(kl_core_accounts).values(data).returning();
 	return result[0];
 }
+
+/**
+ * Export a namespaced object with the functions
+ */
+export const Accounts = {
+	create,
+	validateCreation,
+};

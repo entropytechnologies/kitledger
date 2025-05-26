@@ -1,10 +1,7 @@
 import { describe, test, expect } from "vitest";
 import { createDatabase } from "../../packages/core/services/database/db";
 import { postgresUrl, postgresConfig } from "../test_config";
-import { AccountFactory, LedgerFactory, UnitTypeFactory } from "../../packages/core/services/database/factories";
-import { create as createLedger } from "../../packages/core/actions/ledger_actions";
-import { create as createUnitType } from "../../packages/core/actions/unit_type_actions";
-import { create as createAccount, validateCreation as validateAccountCreation } from "../../packages/core/actions/account_actions";
+import { Ledgers, UnitTypes, Accounts, AccountFactory, LedgerFactory, UnitTypeFactory } from "../../packages/core/main";
 
 createDatabase({
 	postgresUrl,
@@ -12,9 +9,9 @@ createDatabase({
 });
 
 const sample_ledger_data = new LedgerFactory().make();
-const uom_type_array = await createUnitType(new UnitTypeFactory().make());
+const uom_type_array = await UnitTypes.create(new UnitTypeFactory().make());
 sample_ledger_data.unit_type_id = uom_type_array.id;
-const ledger = await createLedger(sample_ledger_data);
+const ledger = await Ledgers.create(sample_ledger_data);
 
 const SUCCESS_REF_ID = `T${Math.floor(Math.random() * 9999)}`;
 
@@ -25,7 +22,7 @@ describe.sequential("Account API", () => {
 		accountPayload.ref_id = SUCCESS_REF_ID;
 		accountPayload.ledger_id = ledger.id;
 
-		const res = await createAccount(accountPayload);
+		const res = await Accounts.create(accountPayload);
 		expect(res.id).toHaveLength(36);
 		expect(res.ref_id).toBe(SUCCESS_REF_ID);
 	});
@@ -35,7 +32,7 @@ describe.sequential("Account API", () => {
 		accountPayload.name = "A".repeat(256);
 		accountPayload.ledger_id = ledger.id;
 
-		const res = await validateAccountCreation(accountPayload);
+		const res = await Accounts.validateCreation(accountPayload);
 		expect(res.success).toBe(false);
 	});
 
@@ -44,7 +41,7 @@ describe.sequential("Account API", () => {
 		accountPayload.ref_id = SUCCESS_REF_ID;
 		accountPayload.ledger_id = ledger.id;
 
-		const res = await validateAccountCreation(accountPayload);
+		const res = await Accounts.validateCreation(accountPayload);
 
 		expect(res.success).toBe(false);
 	});

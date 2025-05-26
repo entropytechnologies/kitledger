@@ -1,7 +1,7 @@
 import { getDbInstance } from "../services/database/db.js";
 import { kl_core_entity_models } from "../services/database/schema.js";
 import z from "zod/v4";
-import { valueIsAvailable } from "../services/database/validation.js";
+import { valueIsAvailable } from "../utils/validation.js";
 import { type NewEntityModel } from "../types/index.js";
 
 /**
@@ -36,7 +36,7 @@ async function altIdIsAvailable(alt_id: string): Promise<boolean> {
  * @param data
  * @returns Promise<z.infer<typeof validationSchema>>
  */
-export async function validateCreation(data: NewEntityModel) {
+async function validateCreation(data: NewEntityModel) {
 	const validationSchema = z.object({
 		id: z.uuid(),
 		ref_id: z.string().max(64, { error: "Ref ID must be less than 64 characters" }).refine(refIdIsAvailable, {
@@ -63,8 +63,16 @@ export async function validateCreation(data: NewEntityModel) {
  * Create a new entity model
  * @param data
  */
-export async function create(data: NewEntityModel) {
+async function create(data: NewEntityModel) {
 	const db = getDbInstance();
 	const result = await db.insert(kl_core_entity_models).values(data).returning();
 	return result[0];
 }
+
+/**
+ * Export a namespaced object with the actions
+ */
+export const EntityModels = {
+	create,
+	validateCreation,
+};

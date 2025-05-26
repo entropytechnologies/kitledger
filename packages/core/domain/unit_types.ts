@@ -2,7 +2,7 @@ import { getDbInstance } from "../services/database/db.js";
 import { kl_core_unit_types } from "../services/database/schema.js";
 import z from "zod/v4";
 import { type NewUnitType } from "../types/index.js";
-import { valueIsAvailable } from "../services/database/validation.js";
+import { valueIsAvailable } from "../utils/validation.js";
 
 /**
  * Check if the name is available
@@ -31,7 +31,7 @@ async function altIdIsAvailable(alt_id: string) {
 	return await valueIsAvailable(kl_core_unit_types, "alt_id", alt_id);
 }
 
-export async function validateCreation(data: NewUnitType) {
+async function validateCreation(data: NewUnitType) {
 	const validationSchema = z.object({
 		id: z.uuid(),
 		ref_id: z.string().max(64, { error: "Ref ID must be less than 64 characters" }).refine(refIdIsAvailable, {
@@ -59,8 +59,16 @@ export async function validateCreation(data: NewUnitType) {
  * @param data
  * @returns Promise<UnitType>
  */
-export async function create(data: NewUnitType) {
+async function create(data: NewUnitType) {
 	const db = getDbInstance();
 	const result = await db.insert(kl_core_unit_types).values(data).returning();
 	return result[0];
 }
+
+/**
+ * Export a namespaced object with the actions
+ */
+export const UnitTypes = {
+	create,
+	validateCreation,
+};
