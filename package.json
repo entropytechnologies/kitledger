@@ -30,7 +30,8 @@
 	"packages/*"
   ],
   "scripts": {
-    
+    "core:build": "npm run build -w @kitledger/core",
+	"core:dev": "npm run dev -w @kitledger/core",
 	"format": "prettier --write \"**/*.{ts,tsx}\"",
     "test": "vitest --run",
 	"test:ui": "vitest --ui",
