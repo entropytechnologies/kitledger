@@ -1,6 +1,6 @@
 import { getDbInstance } from "../services/database/db.js";
 import { kl_core_accounts, kl_core_ledgers, BalanceType } from "../services/database/schema.js";
-import z from "zod";
+import z from "zod/v4";
 import { eq, or } from "drizzle-orm";
 import { valueIsAvailable } from "../services/database/validation.js";
 import { validate as validateUuid } from "uuid";
@@ -40,26 +40,26 @@ export async function validateCreation(data: NewAccount) {
 			id: z.string().uuid(),
 			ref_id: z
 				.string()
-				.max(64, { message: "Ref ID must be less than 64 characters" })
+				.max(64, { error: "Ref ID must be less than 64 characters" })
 				.refine(refIdIsAvailable, {
-					message: "Ref ID already exists",
+					error: "Ref ID already exists",
 				})
 				.optional()
 				.nullable(),
 			alt_id: z
 				.string()
-				.max(64, { message: "Alt ID must be less than 64 characters" })
+				.max(64, { error: "Alt ID must be less than 64 characters" })
 				.refine(altIdIsAvailable, {
-					message: "Alt ID already exists",
+					error: "Alt ID already exists",
 				})
 				.optional()
 				.nullable(),
-			name: z.string().max(255, { message: "Name must be less than 255 characters" }).refine(nameIsAvailable, {
-				message: "Name already exists",
+			name: z.string().max(255, { error: "Name must be less than 255 characters" }).refine(nameIsAvailable, {
+				error: "Name already exists",
 			}),
 			balance_type: z.enum([BalanceType.DEBIT, BalanceType.CREDIT]).optional().nullable(),
 			ledger_id: z.string().optional().nullable(),
-			parent_id: z.string().uuid().optional().nullable(),
+			parent_id: z.uuid().optional().nullable(),
 			meta: z.any().optional().nullable(),
 			active: z.boolean().optional().nullable(),
 		})
@@ -80,7 +80,7 @@ export async function validateCreation(data: NewAccount) {
 				if (!parent) {
 					ctx.addIssue({
 						path: ["parent_id"],
-						message: "Parent ID does not exist",
+						error: "Parent ID does not exist",
 						code: z.ZodIssueCode.custom,
 					});
 				} else {
@@ -94,7 +94,7 @@ export async function validateCreation(data: NewAccount) {
 				if (!data.balance_type) {
 					ctx.addIssue({
 						path: ["balance_type"],
-						message: "balance_type is required when parent_id is not provided",
+						error: "balance_type is required when parent_id is not provided",
 						code: z.ZodIssueCode.custom,
 					});
 				}
@@ -102,7 +102,7 @@ export async function validateCreation(data: NewAccount) {
 				if (!data.ledger_id) {
 					ctx.addIssue({
 						path: ["ledger_id"],
-						message: "ledger_id is required when parent_id is not provided",
+						error: "ledger_id is required when parent_id is not provided",
 						code: z.ZodIssueCode.custom,
 					});
 				} else {
@@ -119,7 +119,7 @@ export async function validateCreation(data: NewAccount) {
 					if (!ledger) {
 						ctx.addIssue({
 							path: ["ledger_id"],
-							message: "Ledger ID does not exist",
+							error: "Ledger ID does not exist",
 							code: z.ZodIssueCode.custom,
 						});
 					} else {

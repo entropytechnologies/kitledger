@@ -1,6 +1,6 @@
 import { getDbInstance } from "../services/database/db.js";
 import { kl_core_unit_types } from "../services/database/schema.js";
-import z from "zod";
+import z from "zod/v4";
 import { type NewUnitType } from "../types/index.js";
 import { valueIsAvailable } from "../services/database/validation.js";
 
@@ -33,20 +33,20 @@ async function altIdIsAvailable(alt_id: string) {
 
 export async function validateCreation(data: NewUnitType) {
 	const validationSchema = z.object({
-		id: z.string().uuid(),
-		ref_id: z.string().max(64, { message: "Ref ID must be less than 64 characters" }).refine(refIdIsAvailable, {
-			message: "Ref ID already exists",
+		id: z.uuid(),
+		ref_id: z.string().max(64, { error: "Ref ID must be less than 64 characters" }).refine(refIdIsAvailable, {
+			error: "Ref ID already exists",
 		}),
 		alt_id: z
 			.string()
-			.max(64, { message: "Alt ID must be less than 64 characters" })
+			.max(64, { error: "Alt ID must be less than 64 characters" })
 			.refine(altIdIsAvailable, {
-				message: "Alt ID already exists",
+				error: "Alt ID already exists",
 			})
 			.optional()
 			.nullable(),
-		name: z.string().max(255, { message: "Name must be less than 255 characters" }).refine(nameIsAvailable, {
-			message: "Name already exists",
+		name: z.string().max(255, { error: "Name must be less than 255 characters" }).refine(nameIsAvailable, {
+			error: "Name already exists",
 		}),
 		active: z.boolean().optional().nullable(),
 	});

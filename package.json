@@ -26,6 +26,10 @@
   "directories": {
     "test": "tests"
   },
+  "workspaces": [
+	"packages/*",
+	"applications/*"
+  ],
   "scripts": {
     "db:custom": "drizzle-kit generate --custom --config=core/services/database/drizzle.config.ts",
     "db:generate": "drizzle-kit generate --config=core/services/database/drizzle.config.ts",

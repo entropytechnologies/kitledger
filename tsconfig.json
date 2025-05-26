@@ -18,7 +18,8 @@
     "noFallthroughCasesInSwitch": true,
     "declaration": true,
     "sourceMap": true,
-    "removeComments": true,
+    "removeComments": true
   },
+  "include": ["core/**/*", "erp/**/*"],
   "exclude": ["node_modules", "tests", "dist"],
 }

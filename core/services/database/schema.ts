@@ -2,7 +2,7 @@ import {
 	type AnyPgColumn,
 	boolean,
 	char,
-	index, // Ensure 'index' is imported
+	index,
 	integer,
 	jsonb,
 	numeric,
