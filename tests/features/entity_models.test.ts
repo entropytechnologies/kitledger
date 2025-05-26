@@ -1,32 +1,13 @@
 import { describe, test, expect } from "vitest";
-import { createServer } from "../../erp/server";
 import { createDatabase } from "../../core/services/database/db";
-import { postgresUrl, postgresConfig } from "../../erp/config";
+import { postgresUrl, postgresConfig } from "../test_config";
 import { EntityModelFactory } from "../../core/services/database/factories";
-import type { EntityModel, NewEntityModel } from "../../core/types/index";
+import { create, validateCreation } from "../../core/actions/entity_model_actions";
 
 createDatabase({
 	postgresUrl,
 	maxConnections: postgresConfig.max_connections,
 });
-const server = createServer();
-
-async function makeRequest(
-	data: NewEntityModel | Partial<EntityModel>, // Using Partial for flexibility
-	method: string,
-	endpoint: string,
-): Promise<Response> {
-	const port = process.env.KL_SERVER_PORT || "8000";
-	const url = `http://localhost:${port}${endpoint}`;
-	const req = new Request(url, {
-		method: method,
-		headers: {
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify(data),
-	});
-	return await server.fetch(req);
-}
 
 const SUCCESS_REF_ID = `T${Math.floor(Math.random() * 9999)}`;
 
@@ -36,28 +17,25 @@ describe.sequential("EntityModel API", () => {
 		const entityModelPayload = new EntityModelFactory().make();
 		entityModelPayload.ref_id = SUCCESS_REF_ID;
 
-		const res = await makeRequest(entityModelPayload, "POST", "/api/entity-models");
-		const json: EntityModel = await res.json();
-
-		expect(res.status).toBe(200);
-		expect(json.id).toHaveLength(36);
+		const res = await create(entityModelPayload);
+		expect(res.id).toHaveLength(36);
+		expect(res.ref_id).toBe(SUCCESS_REF_ID);
 	});
 
 	test("Invalid name fails validation", async () => {
 		const entityModelPayload = new EntityModelFactory().make();
 		entityModelPayload.name = "A".repeat(256);
 
-		const res = await makeRequest(entityModelPayload, "POST", "/api/entity-models");
+		const res = await validateCreation(entityModelPayload);
 
-		expect(res.status).toBe(422);
+		expect(res.success).toBe(false);
 	});
 
 	test("Repeated Ref ID fails validation", async () => {
 		const entityModelPayload = new EntityModelFactory().make();
 		entityModelPayload.ref_id = SUCCESS_REF_ID;
 
-		const res = await makeRequest(entityModelPayload, "POST", "/api/entity-models");
-
-		expect(res.status).toBe(422);
+		const res = await validateCreation(entityModelPayload);
+		expect(res.success).toBe(false);
 	});
 });

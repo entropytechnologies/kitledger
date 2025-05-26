@@ -61,5 +61,6 @@ export async function validateCreation(data: NewUnitType) {
  */
 export async function create(data: NewUnitType) {
 	const db = getDbInstance();
-	return await db.insert(kl_core_unit_types).values(data).returning();
+	const result = await db.insert(kl_core_unit_types).values(data).returning();
+	return result[0];
 }

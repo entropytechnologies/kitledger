@@ -97,5 +97,6 @@ export async function validateCreation(data: NewLedger) {
  */
 export async function create(data: NewLedger) {
 	const db = getDbInstance();
-	return await db.insert(kl_core_ledgers).values(data).returning();
+	const result = await db.insert(kl_core_ledgers).values(data).returning();
+	return result[0];
 }

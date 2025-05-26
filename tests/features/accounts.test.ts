@@ -1,36 +1,20 @@
 import { describe, test, expect } from "vitest";
-import { createServer } from "../../erp/server";
 import { createDatabase } from "../../core/services/database/db";
-import { postgresUrl, postgresConfig } from "../../erp/config";
+import { postgresUrl, postgresConfig } from "../test_config";
 import { AccountFactory, LedgerFactory, UnitTypeFactory } from "../../core/services/database/factories";
 import { create as createLedger } from "../../core/actions/ledger_actions";
 import { create as createUnitType } from "../../core/actions/unit_type_actions";
-import type { Account, NewAccount } from "../../core/types/index";
+import { create as createAccount, validateCreation as validateAccountCreation } from "../../core/actions/account_actions";
 
 createDatabase({
 	postgresUrl,
 	maxConnections: postgresConfig.max_connections,
 });
-const server = createServer();
 
 const sample_ledger_data = new LedgerFactory().make();
 const uom_type_array = await createUnitType(new UnitTypeFactory().make());
-sample_ledger_data.unit_type_id = uom_type_array[0].id; // Assuming uom_type_array[0] exists and has an id
-const created_ledger_array = await createLedger(sample_ledger_data);
-const ledger = created_ledger_array[0]; // Assuming created_ledger_array[0] exists and has an id
-
-async function makeRequest(data: NewAccount | Partial<Account>, method: string, endpoint: string): Promise<Response> {
-	const port = process.env.KL_SERVER_PORT || "8000";
-	const url = `http://localhost:${port}${endpoint}`;
-	const req = new Request(url, {
-		method: method,
-		headers: {
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify(data),
-	});
-	return await server.fetch(req);
-}
+sample_ledger_data.unit_type_id = uom_type_array.id;
+const ledger = await createLedger(sample_ledger_data);
 
 const SUCCESS_REF_ID = `T${Math.floor(Math.random() * 9999)}`;
 
@@ -41,11 +25,9 @@ describe.sequential("Account API", () => {
 		accountPayload.ref_id = SUCCESS_REF_ID;
 		accountPayload.ledger_id = ledger.id;
 
-		const res = await makeRequest(accountPayload, "POST", "/api/accounts");
-		const json: Account = await res.json();
-
-		expect(res.status).toBe(200);
-		expect(json.id).toHaveLength(36);
+		const res = await createAccount(accountPayload);
+		expect(res.id).toHaveLength(36);
+		expect(res.ref_id).toBe(SUCCESS_REF_ID);
 	});
 
 	test("Invalid name fails validation", async () => {
@@ -53,9 +35,8 @@ describe.sequential("Account API", () => {
 		accountPayload.name = "A".repeat(256);
 		accountPayload.ledger_id = ledger.id;
 
-		const res = await makeRequest(accountPayload, "POST", "/api/accounts");
-
-		expect(res.status).toBe(422);
+		const res = await validateAccountCreation(accountPayload);
+		expect(res.success).toBe(false);
 	});
 
 	test("Repeated Ref ID fails validation", async () => {
@@ -63,8 +44,8 @@ describe.sequential("Account API", () => {
 		accountPayload.ref_id = SUCCESS_REF_ID;
 		accountPayload.ledger_id = ledger.id;
 
-		const res = await makeRequest(accountPayload, "POST", "/api/accounts");
+		const res = await validateAccountCreation(accountPayload);
 
-		expect(res.status).toBe(422);
+		expect(res.success).toBe(false);
 	});
 });

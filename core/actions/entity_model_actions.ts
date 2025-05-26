@@ -65,5 +65,6 @@ export async function validateCreation(data: NewEntityModel) {
  */
 export async function create(data: NewEntityModel) {
 	const db = getDbInstance();
-	return await db.insert(kl_core_entity_models).values(data).returning();
+	const result = await db.insert(kl_core_entity_models).values(data).returning();
+	return result[0];
 }

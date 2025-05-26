@@ -27,25 +27,20 @@
     "test": "tests"
   },
   "workspaces": [
-	"packages/*",
-	"applications/*"
+	"packages/*"
   ],
   "scripts": {
     "db:custom": "drizzle-kit generate --custom --config=core/services/database/drizzle.config.ts",
     "db:generate": "drizzle-kit generate --config=core/services/database/drizzle.config.ts",
-    "dev": "tsx watch --env-file=.env erp/main.ts",
-	"format": "prettier --write \"**/*.{ts,tsx,vue}\"",
+	"format": "prettier --write \"**/*.{ts}\"",
     "test": "vitest --run",
 	"test:ui": "vitest --ui",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@hono/node-server": "^1.14.2",
     "drizzle-kit": "^0.31.1",
     "drizzle-orm": "^0.43.1",
-    "hono": "^4.7.10",
     "postgres": "^3.4.7",
-    "tsx": "^4.19.4",
     "uuid": "^11.1.0",
     "zod": "^3.25.0"
   },

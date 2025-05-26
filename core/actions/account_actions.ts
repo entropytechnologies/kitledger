@@ -139,5 +139,6 @@ export async function validateCreation(data: NewAccount) {
  */
 export async function create(data: NewAccount) {
 	const db = getDbInstance();
-	return await db.insert(kl_core_accounts).values(data).returning();
+	const result = await db.insert(kl_core_accounts).values(data).returning();
+	return result[0];
 }

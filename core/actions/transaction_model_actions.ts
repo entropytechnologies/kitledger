@@ -65,5 +65,6 @@ export async function validateCreation(data: NewTransactionModel) {
  */
 export async function create(data: NewTransactionModel) {
 	const db = getDbInstance();
-	return await db.insert(kl_core_transaction_models).values(data).returning();
+	const result = await db.insert(kl_core_transaction_models).values(data).returning();
+	return result[0];
 }
