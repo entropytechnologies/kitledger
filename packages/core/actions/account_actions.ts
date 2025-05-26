@@ -37,7 +37,7 @@ export async function validateCreation(data: NewAccount) {
 	const db = getDbInstance();
 	const validationSchema = z
 		.object({
-			id: z.string().uuid(),
+			id: z.uuid(),
 			ref_id: z
 				.string()
 				.max(64, { error: "Ref ID must be less than 64 characters" })

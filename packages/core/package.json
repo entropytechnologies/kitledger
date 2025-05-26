@@ -1,0 +1,80 @@
+{
+  "name": "@kitledger/core",
+  "version": "0.1.0",
+  "private": false,
+  "description": "Core framework providing foundational ledger and double-entry accounting functionalities for Kitledger.",
+  "keywords": [
+    "kitledger",
+    "ledger",
+    "accounting",
+    "double-entry",
+    "framework",
+    "core"
+  ],
+  "author": "Alejandro Barrera Aponte <abarreraaponte@icloud.com>",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/entropytechnologies/kitledger.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/entropytechnologies/kitledger/issues"
+  },
+  "homepage": "https://github.com/entropytechnologies/kitledger/tree/main/packages/core#readme",
+  "type": "module",
+
+  "main": "./dist/cjs/main.js",
+  "module": "./dist/esm/main.js",
+  "types": "./dist/types/main.d.ts",
+
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/types/main.d.ts",
+        "default": "./dist/esm/main.js"
+      },
+      "require": {
+        "types": "./dist/types/main.d.ts",
+        "default": "./dist/cjs/main.js"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+
+  "scripts": {
+    "build:types": "tsc -p tsconfig.build.json --emitDeclarationOnly --outDir ./dist/types",
+    "build:esm": "esbuild src/main.ts --bundle --outfile=dist/esm/main.js --platform=node --format=esm --sourcemap --external:drizzle-orm --external:postgres --external:uuid --external:zod --external:drizzle-kit",
+    "build:cjs": "esbuild src/main.ts --bundle --outfile=dist/cjs/main.js --platform=node --format=cjs --sourcemap --external:drizzle-orm --external:postgres --external:uuid --external:zod --external:drizzle-kit",
+    "build": "npm run build:types && npm run build:esm && npm run build:cjs",
+	"db:custom": "drizzle-kit generate --custom --config=services/database/drizzle.config.ts",
+    "db:generate": "drizzle-kit generate --config=services/database/drizzle.config.ts",
+    "dev": "npm run build:esm -- --watch",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+
+  "dependencies": {
+    "@types/uuid": "^9.0.8",
+    "drizzle-kit": "^0.31.1",
+    "drizzle-orm": "^0.43.1",
+    "postgres": "^3.4.7",
+    "uuid": "^11.1.0",
+    "zod": "^3.25.0"
+  },
+
+  "devDependencies": {
+	"@faker-js/faker": "^9.0.3",
+    "@types/node": "^22.15.21",
+    "esbuild": "^0.23.0"
+  },
+
+  "publishConfig": {
+    "access": "public"
+  }
+}

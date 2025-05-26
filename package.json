@@ -30,23 +30,13 @@
 	"packages/*"
   ],
   "scripts": {
-    "db:custom": "drizzle-kit generate --custom --config=packages/core/services/database/drizzle.config.ts",
-    "db:generate": "drizzle-kit generate --config=packages/core/services/database/drizzle.config.ts",
+    
 	"format": "prettier --write \"**/*.{ts,tsx}\"",
     "test": "vitest --run",
 	"test:ui": "vitest --ui",
     "typecheck": "tsc --noEmit"
   },
-  "dependencies": {
-    "drizzle-kit": "^0.31.1",
-    "drizzle-orm": "^0.43.1",
-    "postgres": "^3.4.7",
-    "uuid": "^11.1.0",
-    "zod": "^3.25.0"
-  },
   "devDependencies": {
-    "@faker-js/faker": "^9.0.3",
-    "@types/node": "^22.15.21",
     "@vitest/ui": "^3.1.4",
     "prettier": "3.5.3",
     "typescript": "^5.8.3",
