@@ -1,17 +1,4 @@
-import {
-	type AnyPgColumn,
-	boolean,
-	char,
-	index,
-	integer,
-	jsonb,
-	numeric,
-	pgEnum,
-	pgTable,
-	text,
-	uuid,
-	varchar,
-} from "drizzle-orm/pg-core";
+import { type AnyPgColumn, boolean, char, index, integer, jsonb, numeric, pgEnum, pgTable, text, uuid, varchar } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import type { MetaType, TransactionLineType } from "./validation.js";
 

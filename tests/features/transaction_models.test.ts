@@ -1,8 +1,8 @@
 import { describe, test, expect } from "vitest";
-import { createDatabase } from "../../core/services/database/db";
+import { createDatabase } from "../../packages/core/services/database/db";
 import { postgresUrl, postgresConfig } from "../test_config";
-import { TransactionModelFactory } from "../../core/services/database/factories";
-import { create, validateCreation } from "../../core/actions/transaction_model_actions";
+import { TransactionModelFactory } from "../../packages/core/services/database/factories";
+import { create, validateCreation } from "../../packages/core/actions/transaction_model_actions";
 
 createDatabase({
 	postgresUrl,

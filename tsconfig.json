@@ -20,6 +20,6 @@
     "sourceMap": true,
     "removeComments": true
   },
-  "include": ["core/**/*", "erp/**/*"],
+  "include": ["packages/**/*"],
   "exclude": ["node_modules", "tests", "dist"],
 }

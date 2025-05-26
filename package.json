@@ -30,9 +30,9 @@
 	"packages/*"
   ],
   "scripts": {
-    "db:custom": "drizzle-kit generate --custom --config=core/services/database/drizzle.config.ts",
-    "db:generate": "drizzle-kit generate --config=core/services/database/drizzle.config.ts",
-	"format": "prettier --write \"**/*.{ts}\"",
+    "db:custom": "drizzle-kit generate --custom --config=packages/core/services/database/drizzle.config.ts",
+    "db:generate": "drizzle-kit generate --config=packages/core/services/database/drizzle.config.ts",
+	"format": "prettier --write \"**/*.{ts,tsx}\"",
     "test": "vitest --run",
 	"test:ui": "vitest --ui",
     "typecheck": "tsc --noEmit"

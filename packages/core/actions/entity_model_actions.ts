@@ -25,7 +25,7 @@ async function refIdIsAvailable(ref_id: string): Promise<boolean> {
 /**
  * Check if the alt_id is available
  * @param alt_id
- * @returns :Promise<boolean> 
+ * @returns :Promise<boolean>
  */
 async function altIdIsAvailable(alt_id: string): Promise<boolean> {
 	return await valueIsAvailable(kl_core_entity_models, "alt_id", alt_id);

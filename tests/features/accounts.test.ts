@@ -1,10 +1,10 @@
 import { describe, test, expect } from "vitest";
-import { createDatabase } from "../../core/services/database/db";
+import { createDatabase } from "../../packages/core/services/database/db";
 import { postgresUrl, postgresConfig } from "../test_config";
-import { AccountFactory, LedgerFactory, UnitTypeFactory } from "../../core/services/database/factories";
-import { create as createLedger } from "../../core/actions/ledger_actions";
-import { create as createUnitType } from "../../core/actions/unit_type_actions";
-import { create as createAccount, validateCreation as validateAccountCreation } from "../../core/actions/account_actions";
+import { AccountFactory, LedgerFactory, UnitTypeFactory } from "../../packages/core/services/database/factories";
+import { create as createLedger } from "../../packages/core/actions/ledger_actions";
+import { create as createUnitType } from "../../packages/core/actions/unit_type_actions";
+import { create as createAccount, validateCreation as validateAccountCreation } from "../../packages/core/actions/account_actions";
 
 createDatabase({
 	postgresUrl,
