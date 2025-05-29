@@ -1,0 +1,19 @@
+{
+	"name": "@kkitledger/core",
+	"version": "0.0.1",
+	"exports": "./main.ts",
+	"imports": {
+		"@faker-js/faker": "npm:@faker-js/faker@^9.0.3",
+		"@std/path": "jsr:@std/path@^1.0.8",
+		"@std/uuid": "jsr:@std/uuid@^1.0.4",
+		"drizzle-kit": "npm:drizzle-kit@^0.31.1",
+		"drizzle-orm": "npm:drizzle-orm@^0.43.1",
+		"postgres": "npm:postgres@^3.4.4",
+		"zod": "npm:zod@^3.23.8"
+	},
+	"tasks": {
+		"db:custom": "drizzle-kit generate --custom --config=./services/database/drizzle.config.ts",
+		"db:generate": "drizzle-kit generate --config=./services/database/drizzle.config.ts",
+		"db:migrate": "drizzle-kit migrate --config=./services/database/drizzle.config.ts"
+	}
+}

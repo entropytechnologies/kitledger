@@ -1,6 +1,6 @@
-import { describe, test, expect } from "vitest";
-import { postgresUrl, postgresConfig } from "../test_config";
-import { TransactionModels, TransactionModelFactory, createDatabase } from "../../packages/core/main";
+import { assertEquals } from '@std/assert';
+import { postgresConfig, postgresUrl } from '../test_config.ts';
+import { createDatabase, TransactionModelFactory, TransactionModels } from '@kitledger/core';
 
 createDatabase({
 	postgresUrl,
@@ -9,33 +9,45 @@ createDatabase({
 
 const SUCCESS_REF_ID = `T${Math.floor(Math.random() * 9999)}`;
 
-// Using .sequential to maintain similar execution order to Deno's default for interdependent tests.
-describe.sequential("TransactionModel API", () => {
-	test("Create a valid transaction model", async () => {
+Deno.test({
+	name: 'Create a valid transaction model',
+	async fn() {
 		const transactionModelPayload = new TransactionModelFactory().make();
 		transactionModelPayload.ref_id = SUCCESS_REF_ID;
 
 		const res = await TransactionModels.create(transactionModelPayload);
 
-		expect(res.id).toHaveLength(36);
-		expect(res.ref_id).toBe(SUCCESS_REF_ID);
-	});
+		assertEquals(res.id.length, 36);
+		assertEquals(res.ref_id, SUCCESS_REF_ID);
+	},
+	sanitizeOps: false,
+	sanitizeResources: false,
+});
 
-	test("Invalid name fails validation", async () => {
+Deno.test({
+	name: 'Invalid name fails validation',
+	async fn() {
 		const transactionModelPayload = new TransactionModelFactory().make();
-		transactionModelPayload.name = "A".repeat(256);
+		transactionModelPayload.name = 'A'.repeat(256);
 
 		const res = await TransactionModels.validateCreation(transactionModelPayload);
 
-		expect(res.success).toBe(false);
-	});
+		assertEquals(res.success, false);
+	},
+	sanitizeOps: false,
+	sanitizeResources: false,
+});
 
-	test("Repeated Ref ID fails validation", async () => {
+Deno.test({
+	name: 'Repeated Ref ID fails validation',
+	async fn() {
 		const transactionModelPayload = new TransactionModelFactory().make();
 		transactionModelPayload.ref_id = SUCCESS_REF_ID;
 
 		const res = await TransactionModels.validateCreation(transactionModelPayload);
 
-		expect(res.success).toBe(false);
-	});
+		assertEquals(res.success, false);
+	},
+	sanitizeOps: false,
+	sanitizeResources: false,
 });

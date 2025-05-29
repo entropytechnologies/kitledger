@@ -1,0 +1,32 @@
+{
+	"fmt": {
+		"useTabs": true,
+		"lineWidth": 120,
+		"indentWidth": 4,
+		"semiColons": true,
+		"singleQuote": true,
+		"proseWrap": "preserve",
+		"include": ["packages/", "tests/"],
+		"exclude": ["node_modules/"]
+	},
+	"imports": {
+		"@kitledger/core": "./packages/core/main.ts",
+		"@std/assert": "jsr:@std/assert@^1.0.8"
+	},
+	"lint": {
+        "rules": {
+            "tags": ["recommended"]
+        }
+    },
+	"nodeModulesDir": "auto",
+	"tasks": {
+		"check": "deno check packages/**/*.ts tests/**/*.ts",
+		"format": "deno fmt",
+		"lint": "deno lint",
+		"test": "deno test -A --env-file=.env"
+	},
+	"test": {
+		"include": ["tests/"]
+	},
+	"workspace": ["./packages/core"]
+}

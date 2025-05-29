@@ -1,8 +1,8 @@
-import { getDbInstance } from "../services/database/db.js";
-import { kl_core_unit_types } from "../services/database/schema.js";
-import z from "zod/v4";
-import { type NewUnitType } from "../types/index.js";
-import { valueIsAvailable } from "../utils/validation.js";
+import { getDbInstance } from '../services/database/db.ts';
+import { kl_core_unit_types } from '../services/database/schema.ts';
+import z from 'zod/v4';
+import { type NewUnitType } from '../types/index.ts';
+import { valueIsAvailable } from '../utils/validation.ts';
 
 /**
  * Check if the name is available
@@ -10,7 +10,7 @@ import { valueIsAvailable } from "../utils/validation.js";
  * @returns Promise<boolean>
  */
 async function nameIsAvailable(name: string) {
-	return await valueIsAvailable(kl_core_unit_types, "name", name);
+	return await valueIsAvailable(kl_core_unit_types, 'name', name);
 }
 
 /**
@@ -19,7 +19,7 @@ async function nameIsAvailable(name: string) {
  * @returns Promise<boolean>
  */
 async function refIdIsAvailable(ref_id: string) {
-	return await valueIsAvailable(kl_core_unit_types, "ref_id", ref_id);
+	return await valueIsAvailable(kl_core_unit_types, 'ref_id', ref_id);
 }
 
 /**
@@ -28,25 +28,25 @@ async function refIdIsAvailable(ref_id: string) {
  * @returns Promise<boolean>
  */
 async function altIdIsAvailable(alt_id: string) {
-	return await valueIsAvailable(kl_core_unit_types, "alt_id", alt_id);
+	return await valueIsAvailable(kl_core_unit_types, 'alt_id', alt_id);
 }
 
 async function validateCreation(data: NewUnitType) {
 	const validationSchema = z.object({
 		id: z.uuid(),
-		ref_id: z.string().max(64, { error: "Ref ID must be less than 64 characters" }).refine(refIdIsAvailable, {
-			error: "Ref ID already exists",
+		ref_id: z.string().max(64, { error: 'Ref ID must be less than 64 characters' }).refine(refIdIsAvailable, {
+			error: 'Ref ID already exists',
 		}),
 		alt_id: z
 			.string()
-			.max(64, { error: "Alt ID must be less than 64 characters" })
+			.max(64, { error: 'Alt ID must be less than 64 characters' })
 			.refine(altIdIsAvailable, {
-				error: "Alt ID already exists",
+				error: 'Alt ID already exists',
 			})
 			.optional()
 			.nullable(),
-		name: z.string().max(255, { error: "Name must be less than 255 characters" }).refine(nameIsAvailable, {
-			error: "Name already exists",
+		name: z.string().max(255, { error: 'Name must be less than 255 characters' }).refine(nameIsAvailable, {
+			error: 'Name already exists',
 		}),
 		active: z.boolean().optional().nullable(),
 	});

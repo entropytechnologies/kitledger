@@ -1,10 +1,10 @@
-import { getDbInstance } from "../services/database/db.js";
-import { kl_core_accounts, kl_core_ledgers, BalanceType } from "../services/database/schema.js";
-import z from "zod/v4";
-import { eq, or } from "drizzle-orm";
-import { valueIsAvailable } from "../utils/validation.js";
-import { validate as validateUuid } from "uuid";
-import { type NewAccount } from "../types/index.js";
+import { getDbInstance } from '../services/database/db.ts';
+import { BalanceType, kl_core_accounts, kl_core_ledgers } from '../services/database/schema.ts';
+import z from 'zod/v4';
+import { eq, or } from 'drizzle-orm';
+import { valueIsAvailable } from '../utils/validation.ts';
+import { validate as validateUuid } from '@std/uuid';
+import { type NewAccount } from '../types/index.ts';
 
 /**
  * Check if the name is available
@@ -12,7 +12,7 @@ import { type NewAccount } from "../types/index.js";
  * @returns Promise<boolean>
  */
 async function nameIsAvailable(name: string): Promise<boolean> {
-	return await valueIsAvailable(kl_core_accounts, "name", name);
+	return await valueIsAvailable(kl_core_accounts, 'name', name);
 }
 
 /**
@@ -21,7 +21,7 @@ async function nameIsAvailable(name: string): Promise<boolean> {
  * @returns :Promise<boolean>
  */
 async function refIdIsAvailable(ref_id: string): Promise<boolean> {
-	return await valueIsAvailable(kl_core_accounts, "ref_id", ref_id);
+	return await valueIsAvailable(kl_core_accounts, 'ref_id', ref_id);
 }
 
 /**
@@ -30,7 +30,7 @@ async function refIdIsAvailable(ref_id: string): Promise<boolean> {
  * @returns :Promise<boolean>
  */
 async function altIdIsAvailable(alt_id: string): Promise<boolean> {
-	return await valueIsAvailable(kl_core_accounts, "alt_id", alt_id);
+	return await valueIsAvailable(kl_core_accounts, 'alt_id', alt_id);
 }
 
 async function validateCreation(data: NewAccount) {
@@ -40,22 +40,22 @@ async function validateCreation(data: NewAccount) {
 			id: z.uuid(),
 			ref_id: z
 				.string()
-				.max(64, { error: "Ref ID must be less than 64 characters" })
+				.max(64, { error: 'Ref ID must be less than 64 characters' })
 				.refine(refIdIsAvailable, {
-					error: "Ref ID already exists",
+					error: 'Ref ID already exists',
 				})
 				.optional()
 				.nullable(),
 			alt_id: z
 				.string()
-				.max(64, { error: "Alt ID must be less than 64 characters" })
+				.max(64, { error: 'Alt ID must be less than 64 characters' })
 				.refine(altIdIsAvailable, {
-					error: "Alt ID already exists",
+					error: 'Alt ID already exists',
 				})
 				.optional()
 				.nullable(),
-			name: z.string().max(255, { error: "Name must be less than 255 characters" }).refine(nameIsAvailable, {
-				error: "Name already exists",
+			name: z.string().max(255, { error: 'Name must be less than 255 characters' }).refine(nameIsAvailable, {
+				error: 'Name already exists',
 			}),
 			balance_type: z.enum([BalanceType.DEBIT, BalanceType.CREDIT]).optional().nullable(),
 			ledger_id: z.string().optional().nullable(),
@@ -69,18 +69,21 @@ async function validateCreation(data: NewAccount) {
 
 				const filters = is_uuid
 					? {
-							where: eq(kl_core_accounts.id, data.parent_id),
-						}
+						where: eq(kl_core_accounts.id, data.parent_id),
+					}
 					: {
-							where: or(eq(kl_core_accounts.ref_id, data.parent_id), eq(kl_core_accounts.alt_id, data.parent_id)),
-						};
+						where: or(
+							eq(kl_core_accounts.ref_id, data.parent_id),
+							eq(kl_core_accounts.alt_id, data.parent_id),
+						),
+					};
 
 				// Verify that parent_id exists
 				const parent = await db.query.kl_core_accounts.findFirst(filters);
 				if (!parent) {
 					ctx.addIssue({
-						path: ["parent_id"],
-						error: "Parent ID does not exist",
+						path: ['parent_id'],
+						error: 'Parent ID does not exist',
 						code: z.ZodIssueCode.custom,
 					});
 				} else {
@@ -93,33 +96,34 @@ async function validateCreation(data: NewAccount) {
 				// Require balance_type and ledger_id if parent_id is not provided
 				if (!data.balance_type) {
 					ctx.addIssue({
-						path: ["balance_type"],
-						error: "balance_type is required when parent_id is not provided",
+						path: ['balance_type'],
+						error: 'balance_type is required when parent_id is not provided',
 						code: z.ZodIssueCode.custom,
 					});
 				}
 
 				if (!data.ledger_id) {
 					ctx.addIssue({
-						path: ["ledger_id"],
-						error: "ledger_id is required when parent_id is not provided",
+						path: ['ledger_id'],
+						error: 'ledger_id is required when parent_id is not provided',
 						code: z.ZodIssueCode.custom,
 					});
 				} else {
 					const is_uuid = validateUuid(data.ledger_id);
 
-					const filters = is_uuid
-						? { where: eq(kl_core_ledgers.id, data.ledger_id) }
-						: {
-								where: or(eq(kl_core_ledgers.ref_id, data.ledger_id), eq(kl_core_ledgers.alt_id, data.ledger_id)),
-							};
+					const filters = is_uuid ? { where: eq(kl_core_ledgers.id, data.ledger_id) } : {
+						where: or(
+							eq(kl_core_ledgers.ref_id, data.ledger_id),
+							eq(kl_core_ledgers.alt_id, data.ledger_id),
+						),
+					};
 
 					const ledger = await db.query.kl_core_ledgers.findFirst(filters);
 
 					if (!ledger) {
 						ctx.addIssue({
-							path: ["ledger_id"],
-							error: "Ledger ID does not exist",
+							path: ['ledger_id'],
+							error: 'Ledger ID does not exist',
 							code: z.ZodIssueCode.custom,
 						});
 					} else {

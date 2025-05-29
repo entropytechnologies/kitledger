@@ -1,6 +1,6 @@
-import { describe, test, expect } from "vitest";
-import { postgresUrl, postgresConfig } from "../test_config";
-import { UnitTypes, UnitTypeFactory, createDatabase } from "../../packages/core/main";
+import { assertEquals } from '@std/assert';
+import { postgresConfig, postgresUrl } from '../test_config.ts';
+import { createDatabase, UnitTypeFactory, UnitTypes } from '@kitledger/core';
 
 createDatabase({
 	postgresUrl,
@@ -9,33 +9,45 @@ createDatabase({
 
 const SUCCESS_REF_ID = `T${Math.floor(Math.random() * 9999)}`;
 
-// Using .sequential to maintain similar execution order to Deno's default for interdependent tests.
-describe.sequential("UnitType API", () => {
-	test("Create a valid unit type", async () => {
+Deno.test({
+	name: 'Create a valid unit type',
+	async fn() {
 		const unitTypePayload = new UnitTypeFactory().make();
 		unitTypePayload.ref_id = SUCCESS_REF_ID;
 
 		const res = await UnitTypes.create(unitTypePayload);
 
-		expect(res.id).toHaveLength(36);
-		expect(res.ref_id).toBe(SUCCESS_REF_ID);
-	});
+		assertEquals(res.id.length, 36);
+		assertEquals(res.ref_id, SUCCESS_REF_ID);
+	},
+	sanitizeOps: false,
+	sanitizeResources: false,
+});
 
-	test("Invalid name fails validation", async () => {
+Deno.test({
+	name: 'Invalid name fails validation',
+	async fn() {
 		const unitTypePayload = new UnitTypeFactory().make();
-		unitTypePayload.name = "A".repeat(256);
+		unitTypePayload.name = 'A'.repeat(256);
 
 		const res = await UnitTypes.validateCreation(unitTypePayload);
 
-		expect(res.success).toBe(false);
-	});
+		assertEquals(res.success, false);
+	},
+	sanitizeOps: false,
+	sanitizeResources: false,
+});
 
-	test("Repeated Ref ID fails validation", async () => {
+Deno.test({
+	name: 'Repeated Ref ID fails validation',
+	async fn() {
 		const unitTypePayload = new UnitTypeFactory().make();
 		unitTypePayload.ref_id = SUCCESS_REF_ID;
 
 		const res = await UnitTypes.validateCreation(unitTypePayload);
 
-		expect(res.success).toBe(false);
-	});
+		assertEquals(res.success, false);
+	},
+	sanitizeOps: false,
+	sanitizeResources: false,
 });

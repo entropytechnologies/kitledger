@@ -1,11 +1,20 @@
-import { faker } from "@faker-js/faker";
-import { type NewAccount, type NewEntityModel, type NewLedger, type NewTransactionModel, type NewUnitType } from "../types/index.js";
-import { v7 as uuid } from "uuid";
-import { BalanceType } from "../services/database/schema.js";
+import { faker } from '@faker-js/faker';
+import {
+	type NewAccount,
+	type NewEntityModel,
+	type NewLedger,
+	type NewTransactionModel,
+	type NewUnitType,
+} from '../types/index.ts';
+import { generate as uuid } from '@std/uuid/unstable-v7';
+import { BalanceType } from '../services/database/schema.ts';
 
 abstract class Factory {
 	abstract make(type?: string): NewLedger | NewAccount | NewUnitType | NewEntityModel | NewTransactionModel;
-	abstract makeMany(count: number, type?: string): NewLedger[] | NewAccount[] | NewUnitType[] | NewEntityModel[] | NewTransactionModel[];
+	abstract makeMany(
+		count: number,
+		type?: string,
+	): NewLedger[] | NewAccount[] | NewUnitType[] | NewEntityModel[] | NewTransactionModel[];
 }
 
 export class LedgerFactory extends Factory {

@@ -1,6 +1,14 @@
-import { describe, test, expect } from "vitest";
-import { postgresUrl, postgresConfig } from "../test_config";
-import { Ledgers, UnitTypes, Accounts, AccountFactory, LedgerFactory, UnitTypeFactory, createDatabase } from "../../packages/core/main";
+import { assertEquals } from '@std/assert';
+import { postgresConfig, postgresUrl } from '../test_config.ts';
+import {
+	AccountFactory,
+	Accounts,
+	createDatabase,
+	LedgerFactory,
+	Ledgers,
+	UnitTypeFactory,
+	UnitTypes,
+} from '@kitledger/core';
 
 createDatabase({
 	postgresUrl,
@@ -14,34 +22,45 @@ const ledger = await Ledgers.create(sample_ledger_data);
 
 const SUCCESS_REF_ID = `T${Math.floor(Math.random() * 9999)}`;
 
-// Using .sequential to maintain similar execution order to Deno's default for interdependent tests.
-describe.sequential("Account API", () => {
-	test("Create a valid account", async () => {
+Deno.test({
+	name: 'Create a valid account',
+	async fn() {
 		const accountPayload = new AccountFactory().make();
 		accountPayload.ref_id = SUCCESS_REF_ID;
 		accountPayload.ledger_id = ledger.id;
 
 		const res = await Accounts.create(accountPayload);
-		expect(res.id).toHaveLength(36);
-		expect(res.ref_id).toBe(SUCCESS_REF_ID);
-	});
+		assertEquals(res.id.length, 36);
+		assertEquals(res.ref_id, SUCCESS_REF_ID);
+	},
+	sanitizeOps: false,
+	sanitizeResources: false,
+});
 
-	test("Invalid name fails validation", async () => {
+Deno.test({
+	name: 'Invalid name fails validation',
+	async fn() {
 		const accountPayload = new AccountFactory().make();
-		accountPayload.name = "A".repeat(256);
+		accountPayload.name = 'A'.repeat(256);
 		accountPayload.ledger_id = ledger.id;
 
 		const res = await Accounts.validateCreation(accountPayload);
-		expect(res.success).toBe(false);
-	});
+		assertEquals(res.success, false);
+	},
+	sanitizeOps: false,
+	sanitizeResources: false,
+});
 
-	test("Repeated Ref ID fails validation", async () => {
+Deno.test({
+	name: 'Invalid ref_id fails validation',
+	async fn() {
 		const accountPayload = new AccountFactory().make();
-		accountPayload.ref_id = SUCCESS_REF_ID;
+		accountPayload.ref_id = 'A'.repeat(256);
 		accountPayload.ledger_id = ledger.id;
 
 		const res = await Accounts.validateCreation(accountPayload);
-
-		expect(res.success).toBe(false);
-	});
+		assertEquals(res.success, false);
+	},
+	sanitizeOps: false,
+	sanitizeResources: false,
 });
